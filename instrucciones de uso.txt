@@ -1,0 +1,27 @@
+Pasos para habilitar el funcionamiento.
+
+1.	Instalar Dependencias:
+En la terminal pegar:
+pip install gspread pandas openpyxl oauth2client
+nota: si se baja el repositorio las dependencias se instalan automáticamente.
+
+2 	pegar el archivo : actualizador-sheets.json en la carpeta donde se creo el git clone 
+
+
+2.	Desde Google sheets , en el doc a editar se debe compartir con el correo que aparece en el archivo json, se puede abrir el archivo para verlo en el apartado de client_email.
+
+3.	Una vez enviada la invitación se debe copiar el id de la hoja de calculo este aparece en el apartado de la url :
+/d/1ABCdEfGHijKlmnOPqrStUvWXYZ1234567890/edit
+nota: solo la parte en medio de los dos /1---------890/ 
+
+
+4.	En el código de python solo se debe modificar 
+	ID_HOJA = "1tJ34qnbbERsSTXIATWVlEMctI2lyXWq0sytRcCCOsYU"  
+
+	Id_hoja: el que se copio de la url del documento.
+
+5. 	En la variable nombres_hoja se debe poner tal cual los nombres de las hojas que quiere que se actualicen, con el mismo nombre separadas por ",".
+
+6. 	Se puede modificar el tiempo de intervalo, en este caso para la prueba esta puesto en 1, es decir se actualizara el archivo  cada	minuto.
+
+
