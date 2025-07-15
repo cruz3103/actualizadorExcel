@@ -1,29 +1,38 @@
 import gspread
 import pandas as pd
+import time
 from oauth2client.service_account import ServiceAccountCredentials
 
-# 👉 Reemplazá esto con el nombre de tu archivo JSON
+# CONFIGURACIÓN
 ARCHIVO_CREDENCIALES = "actualizador-sheets.json"  
-ID_HOJA = "1tJ34qnbbERsSTXIATWVlEMctI2lyXWq0sytRcCCOsYU"          
+ID_HOJA = "1qssPD7MdZZRvMxlJ_lLLdIx3guQ5CmMijk-fw9gX0zs"          
+NOMBRES_HOJAS = ["Clientes", "Peso", "Ejemplo"]            # Las pestañas que quieras traer
+INTERVALO_MINUTOS = 1  # Intervalo de actualización (en minutos)
 
-# 1. Autenticación con la cuenta de servicio
+# AUTENTICACIÓN
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 credenciales = ServiceAccountCredentials.from_json_keyfile_name(ARCHIVO_CREDENCIALES, scope)
 cliente = gspread.authorize(credenciales)
 
-# 2. Abrir la hoja por ID
-spreadsheet = cliente.open_by_key(ID_HOJA)
+def actualizar_todo_en_un_excel():
+    print("🔄 Iniciando descarga de todas las hojas en un solo archivo...")
 
-# 3. Seleccionar la pestaña llamada 'Clientes'
-hoja = spreadsheet.worksheet("Clientes")
+    spreadsheet = cliente.open_by_key(ID_HOJA)
 
-# 4. Obtener los datos como registros (diccionarios)
-datos = hoja.get_all_records()
+    with pd.ExcelWriter("reporte_completo.xlsx", engine="openpyxl") as writer:
+        for nombre in NOMBRES_HOJAS:
+            try:
+                hoja = spreadsheet.worksheet(nombre)
+                datos = hoja.get_all_records()
+                df = pd.DataFrame(datos)
+                df.to_excel(writer, sheet_name=nombre, index=False)
+                print(f"✅ Hoja '{nombre}' agregada al archivo.")
+            except Exception as e:
+                print(f"❌ Error al procesar la hoja '{nombre}': {e}")
 
-# 5. Convertir a DataFrame de pandas
-df = pd.DataFrame(datos)
+    print("✔️ Archivo 'reporte_completo.xlsx' generado exitosamente.\n")
 
-# 6. Guardar como archivo Excel
-df.to_excel("datos_actualizados.xlsx", index=False)
-
-print("✅ ¡Datos importados y guardados en 'datos_actualizados.xlsx'!")
+while True:
+    actualizar_todo_en_un_excel()
+    print(f"⏳ Esperando {INTERVALO_MINUTOS} minuto(s)...\n")
+    time.sleep(INTERVALO_MINUTOS * 60)
